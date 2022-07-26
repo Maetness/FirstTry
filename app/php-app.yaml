@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-app
+spec:
+  selector:
+    matchLabels:
+      run: php-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: php-app
+    spec:
+      containers:
+      - name: php-app
+        image: mattness/php_app
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-app
+  labels:
+    run: php-app
+spec:
+  ports:
+  - port: 80
+  selector:
+    run: php-app

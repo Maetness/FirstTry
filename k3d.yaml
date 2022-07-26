@@ -1,6 +1,6 @@
 kind: Simple
 #which version of k3d is used
-apiVersion: k3d.io/v5.4.1
+apiVersion: k3d.io/v1alpha3
 #name of the cluster
 name: my-cluster
 #which version of k8s is used
@@ -14,7 +14,4 @@ ports:
 - port: 80:80
   nodeFilters:
   - loadbalancer
-# options:
-#   k3s:
-#     extraServerArgs:
-#     - --no-deploy=traefik
+
