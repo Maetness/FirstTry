@@ -1,0 +1,24 @@
+k3d_setup
+
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash 
+
+setup on fresh installed server ubuntu
+
+snap install docker
+snap install kubectl --classic
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash
+
+k3d cluster create testcluster --api-port 6443 --servers 1 --agents 1 --port "30500-3100:30500-31000@server:0"
+
+or .... k3d cluster create --api-port 6550 -p "8081:80@loadbalancer" --agents 2
+
+use config file for k3d
+
+k3d cluster create --config k3d.yaml
+
+k3d is not using etcd, instead it's using an embedded version of sqlite (I think)
+
+create deployment and expose https://k3d.io/v5.4.1/usage/exposing_services/
+
+
+
