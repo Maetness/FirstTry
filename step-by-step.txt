@@ -1,0 +1,82 @@
+Step by step auf neuer VM
+#updaten
+sudo apt update & upgrade
+#git und repo klonen
+sudo install git damit das Repo mit Config Files da ist
+clone https://github.com/Maetness/FirstTry auf den Desktop
+#docker
+sudo snap intall docker // apt packages leads to problems and the cluster wont start up
+#curl
+sudo apt install curl
+#K3D
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash 
+#kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" 
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+#falls sudo vergessen wird
+chmod 666 /var/run/docker.sock
+
+#swap disable
+sudo swapoff -a 
+
+#ins Verzeichnis mit dem K3D Config file wechseln, it complains about alpha4 but does not actually work with it.
+k3d cluster create --config k3d.yaml 
+
+
+#php app schreiben und containerisieren
+dockerfile:
+FROM php:5-apache
+COPY index.php /var/www/html/index.php
+RUN chmod a+rx index.php
+
+index.php 
+<?php
+  $x = 0.0001;
+  for ($i = 0; $i <= 1000000; $i++) {
+    $x += sqrt($x);
+  }
+  echo "OK!";
+?>
+
+#create php image
+
+docker image build -t mattness/php_app
+
+#eventuell noch ins dockerhup pushen. 
+
+#deployment welches das php image verwendet.
+
+kubectl apply -f ./php-app.yaml
+
+
+hpa automatically scales the number of pods for our deployment (app) to match observed metric specified (cpu). 
+Roughly speaking, the HPA controller will increase and decrease the number of replicas (by updating the Deployment) to maintain an average 
+CPU utilization across all Pods of 50%. The Deployment then updates the ReplicaSet - this is part of how all Deployments work in Kubernetes - 
+and then the ReplicaSet either adds or removes Pods based on the change to its .spec.
+
+
+#metric server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+#create hpa 
+kubectl autoscale deployment php-app --cpu-percent=50 --min=1 --max=10
+#check status
+kubectl get hpa
+
+#increase load in extra terminal window
+kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+
+#continuously watch hpa 
+kubectl get hpa php-app --watch
+
+#observe changed replica number
+kubectl get deployment php-app
+
+#shutdown busyload deployment 
+ctrl+c
+
+
+#wait a couple of minutes and observe downscaling
+kubectl get hpa php-app --watch 
+
