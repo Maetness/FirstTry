@@ -5,14 +5,35 @@ sudo apt update & upgrade
 sudo install git damit das Repo mit Config Files da ist
 clone https://github.com/Maetness/FirstTry auf den Desktop
 #docker
-sudo snap intall docker // apt packages leads to problems and the cluster wont start up
-#curl
-sudo apt install curl
+https://docs.docker.com/engine/install/ubuntu/
+#uninstall older versions
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+#curl and kubectl
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+sudo apt-get update
+sudo apt-get install -y kubectl
+
+
 #K3D
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.0.0 bash 
-#kubectl
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" 
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
 
 #falls sudo vergessen wird
 chmod 666 /var/run/docker.sock
