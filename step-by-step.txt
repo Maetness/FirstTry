@@ -4,6 +4,7 @@ sudo apt update & upgrade
 #git und repo klonen
 sudo install git damit das Repo mit Config Files da ist
 clone https://github.com/Maetness/FirstTry auf den Desktop
+
 #docker
 https://docs.docker.com/engine/install/ubuntu/
 #uninstall older versions
@@ -27,6 +28,7 @@ https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-bi
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl
 sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
 sudo apt-get install -y kubectl
 
@@ -86,7 +88,7 @@ kubectl autoscale deployment php-app --cpu-percent=50 --min=1 --max=10
 kubectl get hpa
 
 #increase load in extra terminal window
-kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-app; done"
 
 #continuously watch hpa 
 kubectl get hpa php-app --watch
@@ -100,4 +102,23 @@ ctrl+c
 
 #wait a couple of minutes and observe downscaling
 kubectl get hpa php-app --watch 
+
+
+k9s:
+#install brew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#add to path 
+Run these two commands in your terminal to add Homebrew to your PATH:
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/dev/.profile
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+
+#dependencies
+sudo apt-get install build-essential
+#install gcc
+brew install gcc
+#install k9s
+ brew install derailed/k9s/k9s
+ 
+ does brew add too much overhead?
 
